@@ -1,0 +1,10 @@
+*.o
+*.gch
+wikitm
+
+*.pyc
+
+*.swp
+*.xml
+*.*~
+*.vim

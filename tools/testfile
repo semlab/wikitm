@@ -1,0 +1,32 @@
+<mediawiki>
+<page>
+	<title>1st Article</title>
+	<revision>
+		<timestamp>2001-12-02T15:08:12Z</timestamp>
+		<text> 1st revision </text>
+	</revision>
+	<revision>
+		<timestamp>2001-12-02T15:40:00Z</timestamp>
+		<text> 2nd revision </text>
+	</revision>
+	<revision>
+		<timestamp>2002-12-02T15:40:00Z</timestamp>
+		<text> 3rd revision </text>
+	</revision>
+</page>
+<page>
+	<title>2nd Article</title>
+	<revision>
+		<timestamp>2001-12-02T15:08:12Z</timestamp>
+		<text> 1st revision </text>
+	</revision>
+	<revision>
+		<timestamp>2001-12-02T15:40:00Z</timestamp>
+		<text> 2nd revision </text>
+	</revision>
+	<revision>
+		<timestamp>2002-12-02T15:40:00Z</timestamp>
+		<text> 3rd revision </text>
+	</revision>
+</page>
+</mediawiki>
