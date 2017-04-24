@@ -16,6 +16,10 @@
 #include <cstring>
 #include <ctime>
 
+#define PAGE_TAG_START  "<page>"
+#define PAGE_TAG_END  "</page>"
+#define REVISION_TAG_TITLE "revision"
+#define NOWHERE -1;
 
 class wikitm {
 
@@ -34,9 +38,10 @@ class wikitm {
 
 
 
-		const std::string PAGE_START = "<page>";
-		const std::string PAGE_END = "</page>";
-		const std::streampos NOWHERE = -1;
+		//const std::string PAGE_TAG_START = "<page>";
+		//const std::string PAGE_TAG_END = "</page>";
+		//const std::string REVISION_TAG_TITLE = "revision";
+		//const std::streampos NOWHERE = -1;
 		const unsigned long CHUNK_SIZE = 1073741824; // 1GB
 
 		//const char *ISO8601 = "%Y-%m-%dT%H:%M:%SZ";

@@ -26,14 +26,14 @@ std::vector<std::string> wikitm::find_pages(std::string& chunk){
 	while(true){  
 		bool has_page_start = false;
 		bool has_page_end = false;
-		int i_pstart = chunk.find( PAGE_START );
-		int i_pend = chunk.find( PAGE_END );
+		int i_pstart = chunk.find( PAGE_TAG_START );
+		int i_pend = chunk.find( PAGE_TAG_END );
 		if ( i_pstart != std::string::npos ){
 			has_page_start = true;
 		}
 		if ( i_pend != std::string::npos ){
 			has_page_end = true;
-			i_pend += PAGE_END.size();
+			i_pend += std::string(PAGE_TAG_END).size();
 		}
 
 		if ( has_page_start && has_page_end ) {
@@ -88,9 +88,9 @@ std::vector<std::string> wikitm::get_latest_revisions( std::vector<boost::gregor
 		rapidxml::xml_node<> *page_node = page_doc.first_node("page");
 		if ( page_node == NULL ) return latest_revisions; // TODO throw an exception
 
-		rapidxml::xml_node<> *ith_revision_node = page_node->first_node("revision");
-		if ( ( timeline[timeline.size()-1] < get_time(page_node->first_node("revision")) ) || 
-				( timeline[0] > get_time(page_node->last_node("revision")) ) ){
+		rapidxml::xml_node<> *ith_revision_node = page_node->first_node(REVISION_TAG_TITLE);
+		if ( ( timeline[timeline.size()-1] < get_time(page_node->first_node(REVISION_TAG_TITLE)) ) || 
+				( timeline[0] > get_time(page_node->last_node(REVISION_TAG_TITLE)) ) ){
 			// timeline is out of the wikipedia range
 			return latest_revisions; // TODO throw exception
 		}
@@ -99,18 +99,18 @@ std::vector<std::string> wikitm::get_latest_revisions( std::vector<boost::gregor
 			latest_revisions[i_timeline] = "";
 			i_timeline++;
 		}
-		while( i_timeline < timeline.size() ) {
+		while( i_timeline < timeline.size() && ith_revision_node != NULL ) {
 			auto ith_revision_time = get_time(ith_revision_node);
 			//std::cout << "timeline[" << i_timeline << "]='" << timeline[i_timeline] \
 				<< "' ith_revision_time='" << ith_revision_time << "'" << std::endl;
 			if ( ith_revision_time > timeline[timeline.size() - 1]){
 				//std::cout << " ====ONE==== " << std::endl;
-				if ( ith_revision_node->previous_sibling("revision") != NULL ){
+				if ( ith_revision_node->previous_sibling(REVISION_TAG_TITLE) != NULL ){
 					for ( int i = i_timeline; i < timeline.size(); i++){
 						std::stringstream ss ;
-						ss  << "<page>" << std::endl \
-							<< *(ith_revision_node->previous_sibling("revision")) \
-							<< "</page>" ; // TODO ith_revision_node->previous_sibling("revision")
+						ss  << PAGE_TAG_START << std::endl \
+							<< *(ith_revision_node->previous_sibling(REVISION_TAG_TITLE)) \
+							<< PAGE_TAG_END ; // TODO ith_revision_node->previous_sibling(REVISION_TAG_TITLE)
 						latest_revisions[i_timeline] = ss.str();
 					}
 				}
@@ -123,24 +123,24 @@ std::vector<std::string> wikitm::get_latest_revisions( std::vector<boost::gregor
 			}
 			else if( ith_revision_time <= timeline[i_timeline]  ){
 				//std::cout << " ====TWO==== " << std::endl;
-				if ( ith_revision_node->next_sibling("revision") == NULL ){
+				if ( ith_revision_node->next_sibling(REVISION_TAG_TITLE) == NULL ){
 					for ( int i = i_timeline; i < timeline.size(); i++){
 						std::stringstream ss ;
-						ss 	<< "<page>" << std::endl \
-							<< *ith_revision_node << "</page>" ; // TODO ith_revision_node->previous_sibling("revision")
+						ss 	<< PAGE_TAG_START << std::endl \
+							<< *ith_revision_node << PAGE_TAG_END ; // TODO ith_revision_node->previous_sibling(REVISION_TAG_TITLE)
 						latest_revisions[i_timeline] = ss.str();
 					}	
 					break;
 				}
 				else {
-					ith_revision_node = ith_revision_node->next_sibling("revision");
+					ith_revision_node = ith_revision_node->next_sibling(REVISION_TAG_TITLE);
 				}
 			}
 			else if ( ith_revision_time > timeline[i_timeline] ){
 				//std::cout << " ====THREE==== " << std::endl;
-				if ( ith_revision_node->previous_sibling("revision") != NULL ){
+				if ( ith_revision_node->previous_sibling(REVISION_TAG_TITLE) != NULL ){
 					std::stringstream ss ;
-					ss << "<page>" << std::endl << *(ith_revision_node->previous_sibling("revision")) << "</page>";
+					ss << PAGE_TAG_START << std::endl << *(ith_revision_node->previous_sibling(REVISION_TAG_TITLE)) << PAGE_TAG_END;
 					latest_revisions[i_timeline] = ss.str();
 				}
 				else {
