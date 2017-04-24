@@ -7,25 +7,18 @@
 namespace fs = boost::filesystem;
 
 
-// Memory size for human reading
-// DEPRECATED
-std::string memsize_h(long memsize)
-{
-	std::string t_suffixes[] = {"B", "KB", "MB", "GB", "TB"};
-	long m = memsize;
-	int s_i = 0;
-	while(m > 1024){
-		m = m / 1024;
-		s_i++;
-	}
-	if (s_i > 4)
-	  return "very big!!";
-	//long m_h = memsize / std::pow(1024, s_i);
-	std::ostringstream ss;
-	//ss <<  m_h << t_suffixes[s_i];
-	ss <<  m << t_suffixes[s_i];
-	return ss.str(); 
+
+wikitm::wikitm( boost::gregorian::date date_start, 
+		boost::gregorian::date_duration date_delta, int date_count, 
+		std::string input_folder, std::string output_folder){
+
+	m_dumpfiles = gen_dumplist(input_folder); 
+	m_timeline = gen_timeline(date_start, date_delta, date_count);
+	m_outfiles = gen_outfiles(m_timeline, output_folder);
+
 }
+
+
 
 
 std::vector<std::string> wikitm::find_pages(std::string& chunk){
@@ -170,39 +163,40 @@ std::vector<std::string> wikitm::get_latest_revisions( std::vector<boost::gregor
 
 
 
-
+/*
 void wikitm::wiki_timelapse( boost::gregorian::date date_start, 
 		boost::gregorian::date_duration date_delta, int date_count,
 		std::string input_folder, std::string output_folder){
-
-	auto dumpfiles = gen_dumplist(input_folder); 
-	auto timeline = gen_timeline(date_start, date_delta, date_count);
-	auto outfiles = gen_outfiles(timeline, output_folder);
+*/
+void wikitm::run(){
+	//auto dumpfiles = gen_dumplist(input_folder); 
+	//auto timeline = gen_timeline(date_start, date_delta, date_count);
+	//auto outfiles = gen_outfiles(timeline, output_folder);
 
 	std::cout << "Dumpfiles:" << std::endl;
-	for( int i = 0; i < dumpfiles.size(); i++){
-		std::cout << "\t" << dumpfiles[i] << std::endl;
+	for( int i = 0; i < m_dumpfiles.size(); i++){
+		std::cout << "\t" << m_dumpfiles[i] << std::endl;
 	}
 	std::cout << "Timeline:" << std::endl;
-	for( int i = 0; i < timeline.size(); i++){
-		std::cout << "\t" << timeline[i] << std::endl;
+	for( int i = 0; i < m_timeline.size(); i++){
+		std::cout << "\t" << m_timeline[i] << std::endl;
 	}
 	std::cout << "Output Files:" << std::endl;
-	for( int i = 0; i < outfiles.size(); i++){
-		std::cout << "\t" << outfiles[i] << std::endl;
+	for( int i = 0; i < m_outfiles.size(); i++){
+		std::cout << "\t" << m_outfiles[i] << std::endl;
 	}
 	
-	for ( int i = 0; i < dumpfiles.size(); i++ ){
+	for ( int i = 0; i < m_dumpfiles.size(); i++ ){
 		long nb_pages_done = 0; // TODO 
 		std::vector<std::string> pages;
 		long chunks_read = 0;
 		std::string chunk_str; 
 		std::string prev_chunk; 
 
-		std::cout << "Processing file" << dumpfiles[i] << std::endl;
-		auto dumpfilepath = dumpfiles[i];
+		std::cout << "Processing file" << m_dumpfiles[i] << std::endl;
+		auto dumpfilepath = m_dumpfiles[i];
 		std::time_t start_time = time(0);
-		uintmax_t dumpfile_size = fs::file_size(dumpfiles[i].c_str()); 
+		uintmax_t dumpfile_size = fs::file_size(m_dumpfiles[i].c_str()); 
 		int file_progress = 0;
 		
 		std::ifstream fin(dumpfilepath.c_str());
@@ -212,8 +206,8 @@ void wikitm::wiki_timelapse( boost::gregorian::date date_start,
 		while( true ){
 			chunks_read += 1;
 			file_progress = ( (long double)(chunks_read*CHUNK_SIZE)/(long double)dumpfile_size ) * 100  ;
-			//BOOST_LOG_TRIVIAL(info) << "File " << i+1 << "/" <<  dumpfiles.size() 
-			std::cout << "File " << i+1 << "/" <<  dumpfiles.size() \
+			//BOOST_LOG_TRIVIAL(info) << "File " << i+1 << "/" <<  m_dumpfiles.size() 
+			std::cout << "File " << i+1 << "/" <<  m_dumpfiles.size() \
 				<< " [" << file_progress << "%]" << std::endl;
 			//std::cout << nb_pages_done << " total pages done" << std::endl; // TODO useless
 			fin.read(chunk, CHUNK_SIZE);
@@ -222,10 +216,10 @@ void wikitm::wiki_timelapse( boost::gregorian::date date_start,
 			pages = find_pages(chunk_str);
 			prev_chunk = chunk_str; // TODO check if the chunk is getting too big 
 			for ( int i_page = 0; i_page < pages.size(); i_page++ ){
-				auto page_revisions = get_latest_revisions(timeline, pages[i_page]);
+				auto page_revisions = get_latest_revisions(m_timeline, pages[i_page]);
 				for (int i_revision = 0; i_revision < page_revisions.size(); i_revision++ ){
 					std::ofstream fout;
-					fout.open( outfiles[i_revision].string() , std::ios_base::app);
+					fout.open( m_outfiles[i_revision].string() , std::ios_base::app);
 					fout << page_revisions[i_revision] << std::endl;
 					fout.close();
 				}

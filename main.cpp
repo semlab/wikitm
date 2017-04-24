@@ -115,7 +115,7 @@ int main(int argc, char *argv[])
 		abort();
 	}
 	
-	wikitm wt;
+	//wikitm wt;
 	std::string input_folder = std::string(arg_input_folder); 
 	std::string output_folder = std::string(arg_output_folder);
 	boost::gregorian::date date_start(boost::gregorian::from_simple_string( std::string(arg_date_start) ));
@@ -129,6 +129,7 @@ int main(int argc, char *argv[])
 	std::cout << output_folder << std::endl;
 	//*/
 
-	wt.wiki_timelapse( date_start, date_delta, date_count, input_folder, output_folder ); 			
+	wikitm wt( date_start, date_delta, date_count, input_folder, output_folder ); 			
+	wt.run();
 
 }
