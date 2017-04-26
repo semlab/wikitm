@@ -59,7 +59,7 @@ class wikitm {
 		std::vector<boost::filesystem::path> m_dumpfiles;
 		std::vector<boost::filesystem::path> m_outfiles;
 		std::vector<boost::gregorian::date> m_timeline;
-		
+		int m_pages_count = 0;		
 
 
 

@@ -15,6 +15,7 @@ wikitm::wikitm( boost::gregorian::date date_start,
 	m_dumpfiles = gen_dumplist(input_folder); 
 	m_timeline = gen_timeline(date_start, date_delta, date_count);
 	m_outfiles = gen_outfiles(m_timeline, output_folder);
+	m_pages_count = 0;
 
 }
 
