@@ -16,6 +16,7 @@
 #include <cstring>
 #include <ctime>
 
+#define DUMPFILE_PREFIX "enwiki-20170101-pages-meta-history"
 #define PAGE_TAG_START  "<page>"
 #define PAGE_TAG_END  "</page>"
 #define REVISION_TAG_TITLE "revision"

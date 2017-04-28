@@ -244,7 +244,9 @@ std::vector<boost::filesystem::path> wikitm::gen_dumplist(std::string input_fold
 	fs::path dumpdir(input_folder);
 	if ( fs::exists(dumpdir) && fs::is_directory(dumpdir) ) {
 		for (fs::directory_entry& f : fs::directory_iterator(dumpdir)){
-			dumplist.push_back(f.path());
+			if (f.path().filename().string().find(DUMPFILE_PREFIX) != std::string::npos ){
+				dumplist.push_back(f.path());
+			}
 		}
 	}
 	return dumplist;
