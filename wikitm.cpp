@@ -241,13 +241,19 @@ void wikitm::run(){
 
 std::vector<boost::filesystem::path> wikitm::gen_dumplist(std::string input_folder){
 	std::vector<boost::filesystem::path> dumplist;
-	fs::path dumpdir(input_folder);
+	fs::path dumpdir(input_folder); // TODO solve relative path .., ~
+	//fs::path dumpdir = fs::system_complete(input_folder); 
 	if ( fs::exists(dumpdir) && fs::is_directory(dumpdir) ) {
 		for (fs::directory_entry& f : fs::directory_iterator(dumpdir)){
+			std::cout << f.path().filename().string() << std::endl;
 			if (f.path().filename().string().find(DUMPFILE_PREFIX) != std::string::npos ){
 				dumplist.push_back(f.path());
 			}
 		}
+	}
+	else {
+		std::cout << dumpdir.string() << 
+			" is not an existing directory" << std::endl;
 	}
 	return dumplist;
 }
