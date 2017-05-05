@@ -3,7 +3,6 @@
 #include "wikitm.hpp"
 
 
-//using minutes = std::chrono::duration<std::chrono::si29,std::chrono::ratio<60>>;
 namespace fs = boost::filesystem;
 
 
@@ -105,7 +104,6 @@ std::vector<std::string> wikitm::get_latest_revisions( std::vector<boost::gregor
 			//std::cout << "timeline[" << i_timeline << "]='" << timeline[i_timeline] \
 				<< "' ith_revision_time='" << ith_revision_time << "'" << std::endl;
 			if ( ith_revision_time > timeline[timeline.size() - 1]){
-				//std::cout << " ====ONE==== " << std::endl;
 				if ( ith_revision_node->previous_sibling(REVISION_TAG_TITLE) != NULL ){
 					for ( int i = i_timeline; i < timeline.size(); i++){
 						std::stringstream ss ;
@@ -123,7 +121,6 @@ std::vector<std::string> wikitm::get_latest_revisions( std::vector<boost::gregor
 				break;
 			}
 			else if( ith_revision_time <= timeline[i_timeline]  ){
-				//std::cout << " ====TWO==== " << std::endl;
 				if ( ith_revision_node->next_sibling(REVISION_TAG_TITLE) == NULL ){
 					for ( int i = i_timeline; i < timeline.size(); i++){
 						std::stringstream ss ;
@@ -138,7 +135,6 @@ std::vector<std::string> wikitm::get_latest_revisions( std::vector<boost::gregor
 				}
 			}
 			else if ( ith_revision_time > timeline[i_timeline] ){
-				//std::cout << " ====THREE==== " << std::endl;
 				if ( ith_revision_node->previous_sibling(REVISION_TAG_TITLE) != NULL ){
 					std::stringstream ss ;
 					ss << PAGE_TAG_START << std::endl << *(ith_revision_node->previous_sibling(REVISION_TAG_TITLE)) << PAGE_TAG_END;
@@ -164,15 +160,7 @@ std::vector<std::string> wikitm::get_latest_revisions( std::vector<boost::gregor
 
 
 
-/*
-void wikitm::wiki_timelapse( boost::gregorian::date date_start, 
-		boost::gregorian::date_duration date_delta, int date_count,
-		std::string input_folder, std::string output_folder){
-*/
 void wikitm::run(){
-	//auto dumpfiles = gen_dumplist(input_folder); 
-	//auto timeline = gen_timeline(date_start, date_delta, date_count);
-	//auto outfiles = gen_outfiles(timeline, output_folder);
 
 	std::cout << "Dumpfiles:" << std::endl;
 	for( int i = 0; i < m_dumpfiles.size(); i++){

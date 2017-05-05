@@ -32,17 +32,10 @@ class wikitm {
 		boost::gregorian::date get_time(rapidxml::xml_node<> *revision_node);
 		std::vector<std::string> get_latest_revisions(
 				std::vector<boost::gregorian::date> timeline, std::string page_s);
-		//void wiki_timelapse( boost::gregorian::date date_start, 
-		//		boost::gregorian::date_duration date_delta, int date_count, 
-		//		std::string dumpfolder, std::string outfolder);
 		void run();
 
 
 
-		//const std::string PAGE_TAG_START = "<page>";
-		//const std::string PAGE_TAG_END = "</page>";
-		//const std::string REVISION_TAG_TITLE = "revision";
-		//const std::streampos NOWHERE = -1;
 		const unsigned long CHUNK_SIZE = 1073741824; // 1GB
 
 		//const char *ISO8601 = "%Y-%m-%dT%H:%M:%SZ";
