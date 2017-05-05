@@ -42,6 +42,7 @@ class wikitm {
 
 	private: 
 		std::vector<boost::filesystem::path> gen_dumplist(std::string input_folder);
+		std::vector<boost::filesystem::path> gen_dumplist_from_file(std::string input_file_path);
 		std::vector<boost::gregorian::date> gen_timeline( boost::gregorian::date date_start, 
 				boost::gregorian::date_duration date_delta, int  date_count );
 		std::vector<boost::filesystem::path> gen_outfiles( 

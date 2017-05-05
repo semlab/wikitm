@@ -233,7 +233,7 @@ std::vector<boost::filesystem::path> wikitm::gen_dumplist(std::string input_fold
 	//fs::path dumpdir = fs::system_complete(input_folder); 
 	if ( fs::exists(dumpdir) && fs::is_directory(dumpdir) ) {
 		for (fs::directory_entry& f : fs::directory_iterator(dumpdir)){
-			std::cout << f.path().filename().string() << std::endl;
+			//std::cout << f.path().filename().string() << std::endl;
 			if (f.path().filename().string().find(DUMPFILE_PREFIX) != std::string::npos ){
 				dumplist.push_back(f.path());
 			}
@@ -242,6 +242,24 @@ std::vector<boost::filesystem::path> wikitm::gen_dumplist(std::string input_fold
 	else {
 		std::cout << dumpdir.string() << 
 			" is not an existing directory" << std::endl;
+	}
+	return dumplist;
+}
+
+
+std::vector<boost::filesystem::path> wikitm::gen_dumplist_from_file(std::string input_file_path){
+	std::vector<boost::filesystem::path> dumplist;
+	std::string line;
+	std::ifstream input_file(input_file_path);
+	if(input_file.is_open() ) {
+		while(!input_file.eof()){
+			std::getline(input_file,line);
+			fs::path dumpfile(line);
+			dumplist.push_back(dumpfile);
+		}
+	}
+	else{
+		std::cerr << "Unable to open '" << input_file_path << "'" << std::endl;
 	}
 	return dumplist;
 }
