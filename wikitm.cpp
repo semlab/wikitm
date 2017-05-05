@@ -278,6 +278,21 @@ std::vector<boost::gregorian::date> wikitm::gen_timeline(boost::gregorian::date 
 	return timeline;
 }
 
+std::vector<boost::gregorian::date> wikitm::gen_timeline_from_file( std::string timeline_file_path ){
+	std::vector<boost::gregorian::date> timeline;	
+	std::string line;
+	std::ifstream timeline_file(timeline_file_path);
+	if(timeline_file.is_open()){
+		while(!timeline_file.eof()){
+			std::getline(timeline_file,line);
+			boost::gregorian::date d(boost::gregorian::from_simple_string( line ));
+			timeline.push_back(d);
+		}
+	}
+	else{
+		std::cerr << "Unable to open '" << timeline_file_path << "'" << std::endl;
+	}
+}
 
 
 
