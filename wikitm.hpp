@@ -33,6 +33,16 @@ class wikitm {
 		boost::gregorian::date get_time(rapidxml::xml_node<> *revision_node);
 		std::vector<std::string> get_latest_revisions(
 				std::vector<boost::gregorian::date> timeline, std::string page_s);
+		std::vector<boost::filesystem::path> gen_dumplist(std::string input_folder);
+		std::vector<boost::filesystem::path> gen_dumplist_from_file(std::string input_file_path);
+		std::vector<boost::gregorian::date> gen_timeline( boost::gregorian::date date_start, 
+				boost::gregorian::date_duration date_delta, int  date_count );
+		std::vector<boost::gregorian::date> gen_timeline_from_file( std::string timeline_file_path );
+		std::vector<boost::filesystem::path> gen_outfiles( 
+				const std::vector<boost::gregorian::date>& timeline, 
+				const std::string& output_folder);
+		std::vector<boost::filesystem::path> gen_outfiles( const std::string& output_folder );
+
 		void run();
 
 
@@ -42,17 +52,7 @@ class wikitm {
 		//const char *ISO8601 = "%Y-%m-%dT%H:%M:%SZ";
 
 	private: 
-		std::vector<boost::filesystem::path> gen_dumplist(std::string input_folder);
-		std::vector<boost::filesystem::path> gen_dumplist_from_file(std::string input_file_path);
-		std::vector<boost::gregorian::date> gen_timeline( boost::gregorian::date date_start, 
-				boost::gregorian::date_duration date_delta, int  date_count );
-		std::vector<boost::gregorian::date> gen_timeline_from_file( std::string timeline_file_path );
-		std::vector<boost::filesystem::path> gen_outfiles( 
-				const std::vector<boost::gregorian::date>& timeline, 
-				const std::string& output_folder);
-
-
-
+		
 		std::vector<boost::filesystem::path> m_dumpfiles;
 		std::vector<boost::filesystem::path> m_outfiles;
 		std::vector<boost::gregorian::date> m_timeline;

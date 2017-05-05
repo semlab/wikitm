@@ -136,12 +136,31 @@ int main(int argc, char *argv[])
 		abort();
 	}
 	//*/
-	//wikitm wt;
+	wikitm wt;
+	if(arg_input_file != NULL){
+		wt.gen_dumplist_from_file( std::string(arg_input_file) );
+	}
+	else{
+		wt.gen_dumplist( std::string(arg_input_folder) );
+	}
+	if(arg_timeline_file != NULL ){
+		wt.gen_timeline_from_file( std::string(arg_timeline_file) );
+	}
+	else{
+		boost::gregorian::date date_start(boost::gregorian::from_simple_string( std::string(arg_date_start) ));
+		boost::gregorian::date_duration date_delta( std::atoi(arg_date_delta) );
+		int date_count = std::atoi(arg_date_count);
+		wt.gen_timeline(date_start, date_delta, date_count);
+	}
+	wt.gen_outfiles( std::string(arg_output_folder) );
+
+	/*
 	std::string input_folder = std::string(arg_input_folder); 
 	std::string output_folder = std::string(arg_output_folder);
 	boost::gregorian::date date_start(boost::gregorian::from_simple_string( std::string(arg_date_start) ));
 	boost::gregorian::date_duration date_delta( std::atoi(arg_date_delta) );
 	int date_count = std::atoi(arg_date_count);
+	*/
 	/*
 	std::cout << date_start << std::endl;
 	std::cout << date_delta << std::endl;
@@ -150,7 +169,7 @@ int main(int argc, char *argv[])
 	std::cout << output_folder << std::endl;
 	//*/
 
-	wikitm wt( date_start, date_delta, date_count, input_folder, output_folder ); 			
+	//wikitm wt( date_start, date_delta, date_count, input_folder, output_folder ); 			
 	wt.run();
 
 }

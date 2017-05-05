@@ -6,6 +6,10 @@
 namespace fs = boost::filesystem;
 
 
+wikitm::wikitm(){
+	m_pages_count = 0;
+
+}
 
 wikitm::wikitm( boost::gregorian::date date_start, 
 		boost::gregorian::date_duration date_delta, int date_count, 
@@ -243,7 +247,8 @@ std::vector<boost::filesystem::path> wikitm::gen_dumplist(std::string input_fold
 		std::cout << dumpdir.string() << 
 			" is not an existing directory" << std::endl;
 	}
-	return dumplist;
+	this->m_dumpfiles = dumplist;
+	return dumplist; 
 }
 
 
@@ -261,7 +266,8 @@ std::vector<boost::filesystem::path> wikitm::gen_dumplist_from_file(std::string 
 	else{
 		std::cerr << "Unable to open '" << input_file_path << "'" << std::endl;
 	}
-	return dumplist;
+	this->m_dumpfiles = dumplist;
+	return dumplist; 
 }
 
 
@@ -275,6 +281,7 @@ std::vector<boost::gregorian::date> wikitm::gen_timeline(boost::gregorian::date 
 		timeline.push_back(t);
 		t += date_delta;
 	}
+	this->m_timeline = timeline;
 	return timeline;
 }
 
@@ -292,6 +299,8 @@ std::vector<boost::gregorian::date> wikitm::gen_timeline_from_file( std::string 
 	else{
 		std::cerr << "Unable to open '" << timeline_file_path << "'" << std::endl;
 	}
+	this->m_timeline = timeline;
+	return timeline;
 }
 
 
@@ -306,9 +315,22 @@ std::vector<boost::filesystem::path> wikitm::gen_outfiles(
 		fs::path outfile(outfilename);
 		outfiles.push_back( outdir / outfile );
 	}
+	this->m_outfiles = outfiles;
 	return outfiles;
 }
 
 
+std::vector<boost::filesystem::path> wikitm::gen_outfiles( const std::string& output_folder ){
+	std::vector<fs::path> outfiles;
+	fs::path outdir(output_folder);
+	for ( int i = 0; i < this->m_timeline.size(); i++ ){
+		auto outfilename = boost::gregorian::to_simple_string(this->m_timeline[i]);
+		fs::path outfile(outfilename);
+		outfiles.push_back( outdir / outfile );
+	}
+	this->m_outfiles = outfiles;
+	return outfiles;
+
+}
 
 
