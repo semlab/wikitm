@@ -38,14 +38,6 @@ void help()
 int main(int argc, char *argv[])
 {
 
-	/*
-	wikitm wt;
-	boost::gregorian::date date_start(boost::gregorian::from_simple_string("2002-01-01"));
-	boost::gregorian::date_duration date_delta(365);
-	int date_count = 5;
-	std::string input_folder = "/media/datahd/dumps.wikimedia.org/enwiki/20170101-uncompressed/history1";
-	std::string output_folder = "/media/datahd/dumps.wikimedia.org/enwiki/snapshots-c";
-	//*/
 
 	//*
 	char* arg_input_file = NULL; 
@@ -128,14 +120,7 @@ int main(int argc, char *argv[])
 		help();
 		abort();
 	}
-	/*/
-	if ( arg_input_folder == NULL || arg_output_folder == NULL 
-		|| arg_date_start == NULL || arg_date_delta == NULL 
-		|| arg_date_count == NULL){
-		help();
-		abort();
-	}
-	//*/
+
 	wikitm wt;
 	if(arg_input_file != NULL){
 		wt.gen_dumplist_from_file( std::string(arg_input_file) );
@@ -154,22 +139,7 @@ int main(int argc, char *argv[])
 	}
 	wt.gen_outfiles( std::string(arg_output_folder) );
 
-	/*
-	std::string input_folder = std::string(arg_input_folder); 
-	std::string output_folder = std::string(arg_output_folder);
-	boost::gregorian::date date_start(boost::gregorian::from_simple_string( std::string(arg_date_start) ));
-	boost::gregorian::date_duration date_delta( std::atoi(arg_date_delta) );
-	int date_count = std::atoi(arg_date_count);
-	*/
-	/*
-	std::cout << date_start << std::endl;
-	std::cout << date_delta << std::endl;
-	std::cout << date_count << std::endl;
-	std::cout << input_folder << std::endl;
-	std::cout << output_folder << std::endl;
-	//*/
 
-	//wikitm wt( date_start, date_delta, date_count, input_folder, output_folder ); 			
 	wt.run();
 
 }
