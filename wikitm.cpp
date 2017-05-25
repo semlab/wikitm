@@ -179,6 +179,7 @@ void wikitm::run(){
 		std::cout << "\t" << m_outfiles[i] << std::endl;
 	}
 	
+	char* chunk = new char[CHUNK_SIZE];
 	for ( int i = 0; i < m_dumpfiles.size(); i++ ){
 		long nb_pages_done = 0; // TODO 
 		std::vector<std::string> pages;
@@ -195,7 +196,6 @@ void wikitm::run(){
 		std::ifstream fin(dumpfilepath.c_str());
 
 		auto t_file_start = std::chrono::system_clock::now();
-		char* chunk = new char[CHUNK_SIZE];
 		while( true ){
 			chunks_read += 1;
 			file_progress = ( (long double)(chunks_read*CHUNK_SIZE)/(long double)dumpfile_size ) * 100  ;
@@ -219,14 +219,14 @@ void wikitm::run(){
 			}
 			nb_pages_done += pages.size();
 		}
-		delete[] chunk;
 		auto t_file_end = std::chrono::system_clock::now();
 		auto d = t_file_end - t_file_start;
 		std::cout << "File " << i+1 << " done in " \
 				<< std::chrono::duration_cast<std::chrono::minutes>(d).count() \
 				<< "minutes"<< std::endl; 
-
 	}
+	delete[] chunk;
+
 }
 
 
