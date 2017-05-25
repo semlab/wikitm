@@ -230,8 +230,15 @@ void wikitm::run(){
 }
 
 
+std::vector<boost::filesystem::path> wikitm::gen_dumplist(std::string filename){
+	std::vector<boost::filesystem::path> dumplist;
+	fs::path dumpfile(filename);
+	dumplist.push_back(dumpfile);
+	this->m_dumpfiles = dumplist;
+	return dumplist; 
+}
 
-std::vector<boost::filesystem::path> wikitm::gen_dumplist(std::string input_folder){
+std::vector<boost::filesystem::path> wikitm::gen_dumplist_from_folder(std::string input_folder){
 	std::vector<boost::filesystem::path> dumplist;
 	fs::path dumpdir(input_folder); // TODO solve relative path .., ~
 	//fs::path dumpdir = fs::system_complete(input_folder); 
