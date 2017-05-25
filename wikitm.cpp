@@ -64,6 +64,31 @@ std::vector<std::string> wikitm::find_pages(std::string& chunk){
 }
 
 
+std::vector<char*> find_pages_char(char* chunk)
+{
+	std::vector<char*> pages;
+	while(true){
+		bool has_page_start = false;
+		bool has_page_end = false;
+		char* pstart = std::strstr( chunk, PAGE_TAG_START );
+		char* pend = std::strstr( chunk, PAGE_TAG_END ); 
+		if (pstart != NULL){
+			has_page_start = true;
+		}
+		if ( pend != NULL ){
+			has_page_end = true;
+			pend += sizeof(char) * strlen( PAGE_TAG_END );
+		}
+
+		if( has_page_start && has_page_end ){
+			if( pstart < pend){
+				//pages.push_back(/* TODO */);
+			}
+		}
+		
+	}
+}
+
 
 boost::gregorian::date wikitm::get_time(rapidxml::xml_node<> *revision_node){
 	boost::gregorian::date d;
@@ -205,7 +230,7 @@ void wikitm::run(){
 			//std::cout << nb_pages_done << " total pages done" << std::endl; // TODO useless
 			fin.read(chunk, CHUNK_SIZE);
 			if ( !fin ) break ;
-			chunk_str.assign(chunk, CHUNK_SIZE); // TODO check if chunk not NULL
+			chunk_str.assign(chunk, CHUNK_SIZE); // TODO check if chunk not NULL TODO Warning Performance killer 
 			pages = find_pages(chunk_str);
 			prev_chunk = chunk_str; // TODO check if the chunk is getting too big 
 			for ( int i_page = 0; i_page < pages.size(); i_page++ ){
