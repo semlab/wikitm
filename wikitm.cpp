@@ -64,14 +64,18 @@ std::vector<std::string> wikitm::find_pages(std::string& chunk){
 }
 
 
-std::vector<char*> find_pages_char(char* chunk)
+std::vector<char*> wikitm::find_pages(char* chunk, char* trail)
 {
 	std::vector<char*> pages;
 	while(true){
 		bool has_page_start = false;
 		bool has_page_end = false;
-		char* pstart = std::strstr( chunk, PAGE_TAG_START );
-		char* pend = std::strstr( chunk, PAGE_TAG_END ); 
+		char* pstart = NULL;
+		char* pend = NULL; 
+		unsigned long page_length = 0;
+
+		pstart = std::strstr( chunk, PAGE_TAG_START );
+		pend = std::strstr( chunk, PAGE_TAG_END ); 
 		if (pstart != NULL){
 			has_page_start = true;
 		}
@@ -82,11 +86,36 @@ std::vector<char*> find_pages_char(char* chunk)
 
 		if( has_page_start && has_page_end ){
 			if( pstart < pend){
-				//pages.push_back(/* TODO */);
+				page_length = pend - pstart;
+				char page[page_length];
+				std::strncpy(page, pstart, page_length);
+				page[page_length] = '\0';
+				pages.push_back(page);
 			}
+			else {
+				has_page_end = false;
+			}
+			chunk += pend; 
 		}
-		
+		else if ( !has_page_start && has_page_end ){
+			chunk += pend; 
+			// Actually this condition is not supposed to happened if the xml file is healthy
+		}
+		else if ( has_page_start && !has_page_end ){
+			chunk += pstart;
+			std::strncpy(trail, chunk, std::strlen(chunk));
+			trail[std::strlen(chunk)] = '\0';
+			break;
+		}
+		else if ( !has_page_start && !has_page_end ){
+			// a tag might be stuck between 2 chunks 
+			chunk += std::strlen(chunk) - std::strlen(PAGE_TAG_END);
+			std::strncpy(trail, chunk, std::strlen(chunk));
+			trail[std::strlen(chunk)] = '\0';
+			break;
+		}
 	}
+	return pages;
 }
 
 
