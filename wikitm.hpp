@@ -32,8 +32,10 @@ class wikitm {
 		std::vector<std::string> find_pages(std::string& chunk);
 		std::vector<char*> find_pages(char* chunk, char* trail);
 		boost::gregorian::date get_time(rapidxml::xml_node<> *revision_node);
+		//std::vector<std::string> get_latest_revisions(
+		//		std::vector<boost::gregorian::date> timeline, std::string page_s);
 		std::vector<std::string> get_latest_revisions(
-				std::vector<boost::gregorian::date> timeline, std::string page_s);
+				std::vector<boost::gregorian::date> timeline, char* page_s);
 		std::vector<boost::filesystem::path> gen_dumplist(std::string filename);
 		std::vector<boost::filesystem::path> gen_dumplist_from_folder(std::string input_folder);
 		std::vector<boost::filesystem::path> gen_dumplist_from_file(std::string input_file_path);
@@ -44,6 +46,8 @@ class wikitm {
 				const std::vector<boost::gregorian::date>& timeline, 
 				const std::string& output_folder);
 		std::vector<boost::filesystem::path> gen_outfiles( const std::string& output_folder );
+		void show_progress(size_t read_size, size_t file_size, 
+				std::chrono::system_clock::time_point starttime );
 
 
 
@@ -61,6 +65,7 @@ class wikitm {
 		std::vector<boost::filesystem::path> m_outfiles;
 		std::vector<boost::gregorian::date> m_timeline;
 		int m_pages_count = 0;		
+		int m_current_file_index = 0;
 
 
 

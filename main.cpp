@@ -136,9 +136,10 @@ int main(int argc, char *argv[])
 	else if(arg_input_file_list != NULL){
 		wt.gen_dumplist_from_file( std::string(arg_input_file_list) );
 	}
-	else{
+	else if (arg_input_folder != NULL ){
 		wt.gen_dumplist_from_folder( std::string(arg_input_folder) );
 	}
+	
 	if(arg_timeline_file != NULL ){
 		wt.gen_timeline_from_file( std::string(arg_timeline_file) );
 	}
@@ -151,5 +152,7 @@ int main(int argc, char *argv[])
 	wt.gen_outfiles( std::string(arg_output_folder) );
 
 	wt.run();
+
+	return 0;
 
 }
