@@ -27,13 +27,23 @@ wikitm::wikitm( boost::gregorian::date date_start,
 
 
 
+
+
 std::vector<std::string> wikitm::find_pages(std::string& chunk){
 	std::vector<std::string> pages;
-	while(true){  
-		bool has_page_start = false;
-		bool has_page_end = false;
-		int i_pstart = chunk.find( PAGE_TAG_START );
-		int i_pend = chunk.find( PAGE_TAG_END );
+	std::string page;
+	bool has_page_start = true;
+	bool has_page_end = true;
+	size_t i_pos = 0;
+	size_t i_plength = 0;
+	size_t i_pstart = 0;
+	size_t i_pend = 0;
+
+	while(has_page_end){  
+		has_page_start = false;
+		has_page_end = false;
+		i_pstart = chunk.find( PAGE_TAG_START, i_pos);
+		i_pend = chunk.find( PAGE_TAG_END, i_pos);
 
 		if ( i_pstart != std::string::npos ){
 			has_page_start = true;
@@ -45,95 +55,31 @@ std::vector<std::string> wikitm::find_pages(std::string& chunk){
 
 		if ( has_page_start && has_page_end ) {
 			if ( i_pstart < i_pend ) {
-				 pages.push_back( chunk.substr(i_pstart,i_pend) );
+				i_plength = i_pend - i_pstart;
+				page = chunk.substr(i_pstart, i_plength);
+				pages.push_back( page );
 			} 
 			else { 
 				has_page_end = false;
 			}
-			chunk = chunk.substr(i_pend, std::string::npos );
+			i_pos = i_pend;
 		} 
 		else if ( !has_page_start && has_page_end ) {
-			chunk = chunk.substr(i_pend, std::string::npos );
+			i_pos = i_pend;
 		}
 		else if ( has_page_start && !has_page_end ) {
 			chunk = chunk.substr(i_pstart, std::string::npos);
-			break;
+			//break;
 		}
-		else if ( !has_page_start && !has_page_end) {
-			break;
-		}
+		//else if ( !has_page_start && !has_page_end) {
+		//	break;
+		//}
 	}
 	return pages;
 }
 
 
-/**
- * Return the beginning position and the ending position of each 
- * page found in a vector containing a 2 sized subvector.
- * trail will the begining of the char left unanalyze
- */
-//*
-std::vector< char* > wikitm::find_pages(char* chunk, char* trail)
-{
-	//char* ch  = reinterpret_cast<char*>(chunk); 
-	char* ch  = chunk; 
-	char* page;
-	std::vector< char* > pages;
 
-	while(true){
-		bool has_page_start = false;
-		bool has_page_end = false;
-		char* pstart = NULL;
-		char* pend = NULL; 
-		unsigned long page_length = 0;
-
-		pstart = std::strstr( ch, PAGE_TAG_START );
-		pend = std::strstr( ch, PAGE_TAG_END ); 
-		if (pstart != NULL){
-			has_page_start = true;
-		}
-		if ( pend != NULL ){
-			has_page_end = true;
-			pend += sizeof(char*) * strlen( PAGE_TAG_END );
-		}
-
-		if( has_page_start && has_page_end ){
-			if( pstart < pend){
-				size_t page_len = (&pend - &pstart)*sizeof(char*);
-				page = new char[page_len];
-				std::strncpy(page, ch, page_len);
-				pages.push_back(page);
-			}
-			else {
-				has_page_end = false;
-			}
-			ch += (&pend - &ch) * sizeof(char*); 
-		}
-		else if ( !has_page_start && has_page_end ){
-			ch += (&pend - &ch) * sizeof(char*); 
-			// Actually this condition is not supposed to happened if the xml file is healthy
-		}
-		else if ( has_page_start && !has_page_end ){
-			ch += (&pstart - &ch) * sizeof(char*);
-			trail = new char[ (&chunk - &ch) * sizeof(char*)];
-			std::strncpy(trail, ch, sizeof(trail));
-			trail[sizeof(trail)] = '\0';
-			break;
-		}
-		else if ( !has_page_start && !has_page_end ){
-			// a tag might be stuck between 2 chunks 
-			// we get ch back from the number of PAGE_TAG_END char
-			// TODO not sure!!
-			//ch += std::strlen(ch) - std::strlen(PAGE_TAG_END);
-			ch += (&ch - &chunk) * sizeof(char*) - std::strlen(PAGE_TAG_END);
-			trail = new char[ (&chunk - &ch) * sizeof(char*)];
-			std::strncpy(trail, ch, sizeof(trail));
-			trail[sizeof(trail)] = '\0';
-			break;
-		}
-	}
-	return pages;
-}
 
 // */
 boost::gregorian::date wikitm::get_time(rapidxml::xml_node<> *revision_node){
@@ -237,13 +183,14 @@ std::vector<std::string> wikitm::get_latest_revisions( std::vector<boost::gregor
 }
 
 
-std::string read_chunk(std::ifstream& infile, /*size_t offset,*/ size_t size){
+
+
+std::string wikitm::read_chunk(std::ifstream& infile, /*size_t offset,*/ size_t size){
 	std::string contents;
-	contents.resize(10);//size);
-	infile.read(&contents[0], 10);// contents.size());
+	contents.resize(size);//size);
+	infile.read(&contents[0], size);// contents.size());
 	if(!infile.bad()){
-		std::cout << "Content read from the file:\n"<< contents << std::endl;
-		exit(0);
+		//std::cout << "Content read from the file:\n"<< contents << std::endl;
 		return contents;
 	}
 	std::cerr << "Error reading file..." << std::endl;
@@ -260,7 +207,6 @@ void wikitm::show_progress(size_t read_size, size_t file_size,
 		<< " [" << file_progress << "%], ellapsed time: " \
 		<< std::chrono::duration_cast<std::chrono::minutes>(t_file_delta).count() \
 		<< "min"<< std::endl; 
-	
 }
 
 
@@ -323,7 +269,6 @@ void wikitm::run(){
 		infile.clear();
 
 		t_file_start = std::chrono::system_clock::now();
-		//chunk = new char[CHUNK_SIZE];
 		while( infile.good() /*true*/ ){
 
 			chunk_str = read_chunk(infile, CHUNK_SIZE); // TODO copy by ref ? 
@@ -343,25 +288,11 @@ void wikitm::run(){
 					fout << page_revisions[i_revision] << std::endl;
 					fout.close();
 				}
-				//delete[] pages[i];
 			}
 			nb_pages_done += pages.size();
-			//file_progress = ( (long double)(chunks_read*CHUNK_SIZE)/(long double)dumpfile_size ) * 100  ;
 			size_read += buf_size;
 			show_progress(size_read, dumpfile_size, t_file_start);
-			/*
-			file_progress = (size_read/dumpfile_size) * 100  ;
-			t_file_delta = std::chrono::system_clock::now() - t_file_start;
-			std::cout << "File " << i+1 << "/" <<  m_dumpfiles.size() \
-				<< " [" << file_progress << "%], ellapsed time: " \
-				<< std::chrono::duration_cast<std::chrono::minutes>(t_file_delta).count() \
-				<< "min"<< std::endl; 
-			// */
-			//std::cout << nb_pages_done << " total pages done" << std::endl; // TODO useless
-			//delete[] buf;
-			//delete[] trail;
 		}
-		//delete[] chunk;
 		std::cout << "File " << i+1 << " done " << std::endl; 
 	}
 }
@@ -379,25 +310,7 @@ std::vector<boost::filesystem::path> wikitm::gen_dumplist(std::string filename){
 	return dumplist; 
 }
 
-std::vector<boost::filesystem::path> wikitm::gen_dumplist_from_folder(std::string input_folder){
-	std::vector<boost::filesystem::path> dumplist;
-	fs::path dumpdir(input_folder); // TODO solve relative path .., ~
-	//fs::path dumpdir = fs::system_complete(input_folder); 
-	if ( fs::exists(dumpdir) && fs::is_directory(dumpdir) ) {
-		for (fs::directory_entry& f : fs::directory_iterator(dumpdir)){
-			//std::cout << f.path().filename().string() << std::endl;
-			if (f.path().filename().string().find(DUMPFILE_PREFIX) != std::string::npos ){
-				dumplist.push_back(f.path());
-			}
-		}
-	}
-	else {
-		std::cout << dumpdir.string() << 
-			" is not an existing directory" << std::endl;
-	}
-	this->m_dumpfiles = dumplist;
-	return dumplist; 
-}
+
 
 
 std::vector<boost::filesystem::path> wikitm::gen_dumplist_from_file(std::string input_file_path){
@@ -457,9 +370,11 @@ std::vector<boost::filesystem::path> wikitm::gen_outfiles(
 			const std::vector<boost::gregorian::date>& timeline, 
 			const std::string& output_folder){
 	std::vector<fs::path> outfiles;
+	std::string outfilename;
 	fs::path outdir(output_folder);
 	for ( int i = 0; i < timeline.size(); i++ ){
-		auto outfilename = boost::gregorian::to_simple_string(timeline[i]);
+		outfilename = boost::gregorian::to_iso_string(timeline[i]);
+		outfilename += ".xml";
 		fs::path outfile(outfilename);
 		outfiles.push_back( outdir / outfile );
 	}
@@ -470,9 +385,11 @@ std::vector<boost::filesystem::path> wikitm::gen_outfiles(
 
 std::vector<boost::filesystem::path> wikitm::gen_outfiles( const std::string& output_folder ){
 	std::vector<fs::path> outfiles;
+	std::string outfilename;
 	fs::path outdir(output_folder);
 	for ( int i = 0; i < this->m_timeline.size(); i++ ){
-		auto outfilename = boost::gregorian::to_simple_string(this->m_timeline[i]);
+		outfilename = boost::gregorian::to_iso_string(this->m_timeline[i]);
+		outfilename += ".xml";
 		fs::path outfile(outfilename);
 		outfiles.push_back( outdir / outfile );
 	}

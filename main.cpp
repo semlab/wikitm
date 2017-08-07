@@ -22,12 +22,12 @@ static int verbose_flag;
 
 void help()
 {
-	std::cout << "Usage: wikitm --input-folder=FOLDER --output-folder=FOLDER --date-start=STARTDATE --date-delta=DELTA --date-count=COUNT [OPTION]...\n";
-	std::cout << "	or: wikitm --input-file=FILE --output-folder=FOLDER --timeline-file=FILE [OPTION]...\n";
+	std::cout << "Usage: wikitm --input-file-list=FILE --output-folder=FOLDER --date-start=STARTDATE --date-delta=DELTA --date-count=COUNT [OPTION]...\n";
+	std::cout << "	or:  wikitm --input-file=FILE --output-folder=FOLDER --timeline-file=FILE [OPTION]...\n";
 	std::cout << "--help		Display this help\n";
 	std::cout << "--input-file=FILE		Single dump file with full history from which the extraction will be perform\n";
 	std::cout << "--input-file-list=FILE		File containing the path of Wikipedia dump files with full history\n";
-	std::cout << "--input-folder=FOLDER		Folder containing Wikipedia dump files with full history\n";
+//	std::cout << "--input-folder=FOLDER		Folder containing Wikipedia dump files with full history\n";
 	std::cout << "--output-folder=FOLDER		File name of the generated dump\n";
 	std::cout << "--timeline-file=FILE		File name of the input file of the timeline (one date per line)\n";
 	std::cout << "--date-start=yyy-MM-dd		the time used to generate the dump. Specified with ISO8601 format.\n";
@@ -59,9 +59,9 @@ int main(int argc, char *argv[])
 			{"verbose", no_argument, &verbose_flag, 1},
 			// no flag options
 			{"help", no_argument, 0, 'h'},
-			{"input-file", required_argument, 0, 'i'},
-			{"input-file-list", required_argument, 0, 'l'},
-			{"input-folder", required_argument, 0, 'I'},
+			{"input-file", required_argument, 0, 'f'},
+			{"input-file-list", required_argument, 0, 'i'},
+			//{"input-folder", required_argument, 0, 'I'},
 			{"output-folder", required_argument, 0, 'o'},
 			{"timeline-file", required_argument, 0, 't'},
 			{"date-start", required_argument, 0, 's'},
@@ -87,15 +87,15 @@ int main(int argc, char *argv[])
 				help();
 				exit(0);
 				break;
-			case 'i':
+			case 'f':
 				arg_input_file = optarg;
 				break;
-			case 'l':
+			case 'i':
 				arg_input_file_list = optarg;
 				break;
-			case 'I':
-				arg_input_folder = optarg;
-				break;
+			//case 'I':
+			//	arg_input_folder = optarg;
+			//	break;
 			case 'o':
 				arg_output_folder = optarg;
 				break;
@@ -121,7 +121,7 @@ int main(int argc, char *argv[])
 		}
 	}
 
-	if ( (arg_input_file == NULL && arg_input_file_list == NULL && arg_input_folder == NULL)
+	if ( (arg_input_file == NULL && arg_input_file_list == NULL /*&& arg_input_folder == NULL*/)
 		||( arg_timeline_file == NULL && (arg_date_start == NULL || arg_date_delta == NULL || arg_date_count == NULL) )
 		|| arg_output_folder == NULL ){
 		std::cout << "Wrong usage" << std::endl;
@@ -136,9 +136,9 @@ int main(int argc, char *argv[])
 	else if(arg_input_file_list != NULL){
 		wt.gen_dumplist_from_file( std::string(arg_input_file_list) );
 	}
-	else if (arg_input_folder != NULL ){
-		wt.gen_dumplist_from_folder( std::string(arg_input_folder) );
-	}
+	//else if (arg_input_folder != NULL ){
+	//	wt.gen_dumplist_from_folder( std::string(arg_input_folder) );
+	//}
 	
 	if(arg_timeline_file != NULL ){
 		wt.gen_timeline_from_file( std::string(arg_timeline_file) );

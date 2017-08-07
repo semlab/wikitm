@@ -37,7 +37,7 @@ class wikitm {
 		std::vector<std::string> get_latest_revisions(
 				std::vector<boost::gregorian::date> timeline, char* page_s);
 		std::vector<boost::filesystem::path> gen_dumplist(std::string filename);
-		std::vector<boost::filesystem::path> gen_dumplist_from_folder(std::string input_folder);
+		//std::vector<boost::filesystem::path> gen_dumplist_from_folder(std::string input_folder);
 		std::vector<boost::filesystem::path> gen_dumplist_from_file(std::string input_file_path);
 		std::vector<boost::gregorian::date> gen_timeline( boost::gregorian::date date_start, 
 				boost::gregorian::date_duration date_delta, int  date_count );
@@ -48,6 +48,7 @@ class wikitm {
 		std::vector<boost::filesystem::path> gen_outfiles( const std::string& output_folder );
 		void show_progress(size_t read_size, size_t file_size, 
 				std::chrono::system_clock::time_point starttime );
+		std::string read_chunk(std::ifstream& infile, /*size_t offset,*/ size_t size);
 
 
 
