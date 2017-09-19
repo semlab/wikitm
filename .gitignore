@@ -1,7 +1,6 @@
-bin
+cpp/bin
 *.o
 *.gch
-wikitm
 
 *.pyc
 
