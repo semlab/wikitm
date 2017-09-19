@@ -1,4 +1,4 @@
-wikitm - Wikipedia Time Machiine 
+# wikitm - Wikipedia Time Machiine 
 
 Use full dump of Wikipedia (including all revision) to rebuild snapshots of wikipedia dumps 
 representing the state of Wikipedia for a given timeline. 
