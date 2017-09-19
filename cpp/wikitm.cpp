@@ -39,7 +39,8 @@ std::vector<std::string> wikitm::find_pages(std::string& chunk){
 	size_t i_pstart = 0;
 	size_t i_pend = 0;
 
-	while(has_page_end){  
+	//while(has_page_end){  
+	while(true){  
 		has_page_start = false;
 		has_page_end = false;
 		i_pstart = chunk.find( PAGE_TAG_START, i_pos);
@@ -69,11 +70,11 @@ std::vector<std::string> wikitm::find_pages(std::string& chunk){
 		}
 		else if ( has_page_start && !has_page_end ) {
 			chunk = chunk.substr(i_pstart, std::string::npos);
-			//break;
+			break;
 		}
-		//else if ( !has_page_start && !has_page_end) {
-		//	break;
-		//}
+		else if ( !has_page_start && !has_page_end) {
+			break;
+		}
 	}
 	return pages;
 }
@@ -110,22 +111,25 @@ std::vector<std::string> wikitm::get_latest_revisions( std::vector<boost::gregor
 		//page_doc.parse<0>(&page_s[0]);
 		page_doc.parse<0>(page_s);
 		rapidxml::xml_node<> *page_node = page_doc.first_node("page");
-		if ( page_node == NULL ) return latest_revisions; // TODO throw an exception
-
+		if ( page_node == NULL ){
+			std::cout << "Parsing yield a NULL node" << std::endl;
+			return latest_revisions; // TODO throw an exception
+		} 
 		rapidxml::xml_node<> *ith_revision_node = page_node->first_node(REVISION_TAG_TITLE);
 		if ( ( timeline[timeline.size()-1] < get_time(page_node->first_node(REVISION_TAG_TITLE)) ) || 
 				( timeline[0] > get_time(page_node->last_node(REVISION_TAG_TITLE)) ) ){
-			// timeline is out of the wikipedia range
+			std::cout << "Timeline is out of wikipedia timeline range" << std::endl;
 			return latest_revisions; // TODO throw exception
 		}
 		while ( timeline[i_timeline] < get_time(ith_revision_node)  
 				&& i_timeline < timeline.size() ) {
 			latest_revisions[i_timeline] = "";
+			std::cout << "Page has no revision for this date" << std::endl;
 			i_timeline++;
 		}
 		while( i_timeline < timeline.size() && ith_revision_node != NULL ) {
 			auto ith_revision_time = get_time(ith_revision_node);
-			//std::cout << "timeline[" << i_timeline << "]='" << timeline[i_timeline] \
+			std::cout << "timeline[" << i_timeline << "]='" << timeline[i_timeline] \
 				<< "' ith_revision_time='" << ith_revision_time << "'" << std::endl;
 			if ( ith_revision_time > timeline[timeline.size() - 1]){
 				if ( ith_revision_node->previous_sibling(REVISION_TAG_TITLE) != NULL ){
@@ -175,10 +179,13 @@ std::vector<std::string> wikitm::get_latest_revisions( std::vector<boost::gregor
 	}
 	catch ( rapidxml::parse_error& e) {
 	  	std::cerr << "Parsing ...failed!" << std::endl;
+	  	std::cout << "Parsing ...failed!" << std::endl;
 		std::cerr << "\t" << e.what() << " at " << e.where<std::streampos>(); 
 		std::cerr <<  std::endl;
 		return latest_revisions;
 	}
+
+	std::cout << "Number of revisions for the page"<< latest_revisions.size() << std::endl;
 	return latest_revisions;
 }
 
@@ -186,9 +193,11 @@ std::vector<std::string> wikitm::get_latest_revisions( std::vector<boost::gregor
 
 
 std::string wikitm::read_chunk(std::ifstream& infile, /*size_t offset,*/ size_t size){
+	std::cout << "Reading from file position: " << infile.tellg() << std::endl;
 	std::string contents;
 	contents.resize(size);//size);
 	infile.read(&contents[0], size);// contents.size());
+	std::cout << "Read : " << contents.size() << std::endl;
 	if(!infile.bad()){
 		//std::cout << "Content read from the file:\n"<< contents << std::endl;
 		return contents;
@@ -201,7 +210,8 @@ std::string wikitm::read_chunk(std::ifstream& infile, /*size_t offset,*/ size_t 
 
 void wikitm::show_progress(size_t read_size, size_t file_size, 
 		std::chrono::system_clock::time_point starttime ){
-	int file_progress = (read_size/file_size) * 100  ;
+	//double file_progress = (double(read_size)/double(file_size)) * 100  ;
+	int file_progress = (double(read_size)/double(file_size)) * 100  ;
 	auto t_file_delta = std::chrono::system_clock::now() - starttime;
 	std::cout << "File " << m_current_file_index +1 << "/" <<  m_dumpfiles.size() \
 		<< " [" << file_progress << "%], ellapsed time: " \
@@ -225,7 +235,7 @@ void wikitm::run(){
 	long chunks_read = 0;
 	std::string chunk_str; 
 	std::string prev_chunk; 
-	size_t buf_size = 0;
+	size_t buf_size = CHUNK_SIZE;
 	size_t size_read = 0;
 	size_t trail_len = 0;
 
@@ -254,7 +264,6 @@ void wikitm::run(){
 		pages.clear();
 		chunk_str = ""; 
 		prev_chunk = ""; 
-		buf_size = 0;
 		size_read = 0;
 		trail_len = 0;
 
@@ -271,10 +280,11 @@ void wikitm::run(){
 		t_file_start = std::chrono::system_clock::now();
 		while( infile.good() /*true*/ ){
 
-			chunk_str = read_chunk(infile, CHUNK_SIZE); // TODO copy by ref ? 
+			chunk_str = read_chunk(infile, buf_size); // TODO copy by ref ? 
 			pages = find_pages(chunk_str);
+			std::cout << "Number of pages found: " << pages.size() << std::endl;
 			prev_chunk = chunk_str; 
-			if( prev_chunk.size() > CHUNK_SIZE ){// check if the chunk will get too big 
+			if( prev_chunk.size() > buf_size ){// check if the chunk will get too big 
 				std::cout << "FATAL ERROR: Not enough space to parse File "<< i << std::endl;
 				std::cout << "Try increasing the chunk size and run again "<< i << std::endl;
 				throw (errno);
@@ -282,6 +292,7 @@ void wikitm::run(){
 			chunks_read += 1;
 			for ( int i_page = 0; i_page < pages.size(); i_page++ ){
 				auto page_revisions = get_latest_revisions(m_timeline, &pages[i_page][0]);
+				std::cout << "Number of revisions got: " << page_revisions.size() << std::endl;
 				for (int i_revision = 0; i_revision < page_revisions.size(); i_revision++ ){
 					std::ofstream fout;
 					fout.open( m_outfiles[i_revision].string() , std::ios_base::app);
